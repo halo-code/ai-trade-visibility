@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 外贸可见度 — 海外买家问 AI 找供应商时，你在名单里吗？</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700;800;900&family=Noto+Serif+SC:wght@400;600;700&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --ink: #1a1a2e;
+            --ink-light: #3d3d55;
+            --ink-muted: #6b6b80;
+            --paper: #f7f6f3;
+            --paper-warm: #efede8;
+            --white: #ffffff;
+            --accent: #c45c1a;
+            --accent-deep: #a34a10;
+            --accent-light: rgba(196, 92, 26, 0.08);
+            --rule: #d4d1c9;
+            --rule-light: #e5e2da;
+            --dark-surface: #12121f;
+            --dark-card: #1c1c30;
+            --dark-rule: rgba(255,255,255,0.07);
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Noto Sans SC', -apple-system, sans-serif;
+            background: var(--paper);
+            color: var(--ink);
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 40px; }
+
+        /* ========== HEADER ========== */
+        .header {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+            background: rgba(247, 246, 243, 0.92);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--rule-light);
+        }
+        .header-inner {
+            max-width: 1200px; margin: 0 auto; padding: 0 40px;
+            height: 64px; display: flex; align-items: center; justify-content: space-between;
+        }
+        .logo { font-size: 17px; font-weight: 800; color: var(--ink); letter-spacing: 0.02em; text-decoration: none; }
+        .logo em { font-style: normal; color: var(--accent); }
+        .nav { display: flex; align-items: center; gap: 32px; }
+        .nav a { color: var(--ink-muted); text-decoration: none; font-size: 14px; font-weight: 500; transition: color 0.2s; }
+        .nav a:hover { color: var(--ink); }
+        .nav-cta {
+            background: var(--ink); color: var(--white) !important;
+            padding: 9px 22px; border-radius: 4px; font-size: 13px; font-weight: 600;
+            transition: background 0.2s;
+        }
+        .nav-cta:hover { background: var(--accent); }
+
+        /* ========== HERO ========== */
+        .hero {
+            min-height: 100vh;
+            padding-top: 64px;
+            display: flex; align-items: center;
+            background: var(--paper);
+            position: relative;
+        }
+        .hero::after {
+            content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+            background: var(--rule);
+        }
+        .hero-inner {
+            max-width: 1200px; margin: 0 auto; padding: 80px 40px;
+            display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;
+            width: 100%;
+        }
+        .hero-left .kicker {
+            font-size: 12px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase;
+            color: var(--accent); margin-bottom: 24px;
+            display: flex; align-items: center; gap: 12px;
+        }
+        .hero-left .kicker::before { content: ''; width: 32px; height: 2px; background: var(--accent); }
+        .hero-left h1 {
+            font-size: 48px; font-weight: 900; line-height: 1.2; color: var(--ink);
+            letter-spacing: -0.02em; margin-bottom: 28px;
+        }
+        .hero-left h1 .accent { color: var(--accent); }
+        .hero-left .sub {
+            font-size: 17px; color: var(--ink-muted); line-height: 1.8; max-width: 480px; margin-bottom: 16px;
+        }
+        .hero-left .core {
+            font-size: 15px; color: var(--ink-light); font-weight: 600;
+            padding: 16px 0; border-top: 1px solid var(--rule-light); border-bottom: 1px solid var(--rule-light);
+            margin-bottom: 36px; max-width: 480px;
+        }
+        .hero-actions { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+        .btn-main {
+            background: var(--accent); color: var(--white); padding: 16px 36px;
+            border-radius: 4px; text-decoration: none; font-size: 15px; font-weight: 700;
+            transition: all 0.25s; display: inline-block;
+        }
+        .btn-main:hover { background: var(--accent-deep); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(196,92,26,0.25); }
+        .hero-note { font-size: 13px; color: var(--ink-muted); }
+
+        /* Chat panel */
+        .chat-panel {
+            background: var(--white); border: 1px solid var(--rule-light);
+            border-radius: 8px; overflow: hidden;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+        }
+        .chat-bar {
+            padding: 14px 20px; border-bottom: 1px solid var(--rule-light);
+            display: flex; align-items: center; justify-content: space-between;
+            background: var(--paper-warm);
+        }
+        .chat-bar-label { font-size: 12px; font-weight: 600; color: var(--ink-muted); letter-spacing: 0.05em; }
+        .chat-bar-tag {
+            font-size: 10px; font-weight: 700; color: var(--accent); letter-spacing: 0.08em;
+            background: var(--accent-light); padding: 3px 8px; border-radius: 3px;
+        }
+        .chat-body { padding: 28px 24px; }
+
+        .msg { margin-bottom: 24px; opacity: 0; transform: translateY(12px); animation: msgIn 0.5s ease forwards; }
+        .msg:nth-child(1) { animation-delay: 0.3s; }
+        .msg:nth-child(2) { animation-delay: 0.9s; }
+        .msg:nth-child(3) { animation-delay: 1.5s; }
+        .msg:nth-child(4) { animation-delay: 2.1s; }
+        .msg:nth-child(5) { animation-delay: 2.7s; }
+        @keyframes msgIn { to { opacity: 1; transform: translateY(0); } }
+
+        .msg-sender {
+            font-size: 11px; font-weight: 700; color: var(--ink-muted);
+            letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px;
+        }
+        .msg-sender.buyer { color: var(--ink-light); }
+        .msg-sender.ai { color: var(--accent); }
+
+        .msg-text {
+            font-size: 14px; color: var(--ink); line-height: 1.7;
+            padding: 14px 18px; border-radius: 6px;
+        }
+        .msg-text.buyer-msg { background: var(--paper-warm); }
+        .msg-text.ai-msg { background: var(--accent-light); border-left: 3px solid var(--accent); }
+
+        .supplier-list { margin-top: 12px; padding: 0; list-style: none; }
+        .supplier-list li {
+            font-size: 13px; color: var(--ink-muted); padding: 5px 0;
+            border-bottom: 1px solid rgba(196,92,26,0.1);
+            display: flex; align-items: center; gap: 8px;
+        }
+        .supplier-list li:last-child { border-bottom: none; }
+        .supplier-list li .rank {
+            font-size: 10px; font-weight: 800; color: var(--accent);
+            width: 18px; height: 18px; border-radius: 3px;
+            background: rgba(196,92,26,0.12); display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .supplier-list li .name { color: var(--ink); font-weight: 600; }
+        .supplier-list li.you .name { color: var(--accent); font-weight: 700; }
+        .supplier-list li.you .tag {
+            font-size: 10px; color: var(--white); background: var(--accent);
+            padding: 1px 6px; border-radius: 2px; font-weight: 700;
+        }
+
+        .chat-question {
+            text-align: center; padding: 16px 20px; margin-top: 8px;
+            border: 1px dashed rgba(196,92,26,0.3); border-radius: 6px;
+        }
+        .chat-question span {
+            font-size: 14px; font-weight: 700; color: var(--accent);
+        }
+
+        /* ========== SECTION COMMON ========== */
+        .section { padding: 100px 0; }
+        .section + .section { border-top: 1px solid var(--rule-light); }
+        .sec-head { max-width: 720px; margin-bottom: 64px; }
+        .sec-kicker {
+            font-size: 12px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase;
+            color: var(--accent); margin-bottom: 16px;
+            display: flex; align-items: center; gap: 12px;
+        }
+        .sec-kicker::before { content: ''; width: 32px; height: 2px; background: var(--accent); }
+        .sec-title {
+            font-size: 36px; font-weight: 900; color: var(--ink);
+            line-height: 1.25; letter-spacing: -0.01em; margin-bottom: 16px;
+        }
+        .sec-desc { font-size: 16px; color: var(--ink-muted); line-height: 1.8; }
+
+        /* ========== PLATFORMS ========== */
+        .platforms-strip {
+            background: var(--dark-surface); padding: 56px 0;
+        }
+        .platforms-inner {
+            max-width: 1200px; margin: 0 auto; padding: 0 40px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .platforms-label { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.4); letter-spacing: 0.1em; text-transform: uppercase; }
+        .platforms-names { display: flex; gap: 48px; }
+        .platforms-names span {
+            font-size: 18px; font-weight: 700; color: rgba(255,255,255,0.7); letter-spacing: 0.02em;
+        }
+        .platforms-note {
+            max-width: 1200px; margin: 12px auto 0; padding: 0 40px;
+            font-size: 11px; color: rgba(255,255,255,0.25); text-align: right;
+        }
+
+        /* ========== DECISION CHAIN ========== */
+        .chain-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 0;
+            border: 1px solid var(--rule-light); border-radius: 8px; overflow: hidden;
+        }
+        .chain-item {
+            padding: 40px 32px; position: relative;
+            border-right: 1px solid var(--rule-light);
+            transition: background 0.25s;
+        }
+        .chain-item:last-child { border-right: none; }
+        .chain-item:hover { background: var(--white); }
+        .chain-num {
+            font-family: 'Noto Serif SC', serif;
+            font-size: 64px; font-weight: 700; color: var(--rule);
+            line-height: 1; margin-bottom: 16px;
+        }
+        .chain-item:hover .chain-num { color: var(--accent); }
+        .chain-name { font-size: 18px; font-weight: 800; color: var(--ink); margin-bottom: 12px; }
+        .chain-q {
+            font-size: 13px; color: var(--ink-muted); line-height: 1.7;
+            font-style: italic; padding-top: 12px; border-top: 1px solid var(--rule-light);
+        }
+
+        /* ========== REPORT ========== */
+        .report-section { background: var(--white); }
+        .report-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            font-size: 11px; font-weight: 700; color: var(--accent);
+            letter-spacing: 0.08em; margin-bottom: 40px;
+            padding: 5px 12px; border: 1px solid rgba(196,92,26,0.25); border-radius: 3px;
+        }
+        .report-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+        .report-top {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 0;
+            border: 1px solid var(--rule-light); border-radius: 8px; overflow: hidden;
+            margin-bottom: 32px;
+        }
+        .report-metric {
+            padding: 40px 32px; text-align: center;
+            border-right: 1px solid var(--rule-light);
+        }
+        .report-metric:last-child { border-right: none; }
+        .metric-label {
+            font-size: 11px; font-weight: 700; color: var(--ink-muted);
+            letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 12px;
+        }
+        .metric-value {
+            font-size: 56px; font-weight: 900; color: var(--ink);
+            line-height: 1; letter-spacing: -0.02em; margin-bottom: 8px;
+        }
+        .metric-value.orange { color: var(--accent); }
+        .metric-detail { font-size: 13px; color: var(--ink-muted); }
+
+        .report-bottom {
+            display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0;
+            border: 1px solid var(--rule-light); border-radius: 8px; overflow: hidden;
+        }
+        .report-col { padding: 32px; border-right: 1px solid var(--rule-light); }
+        .report-col:last-child { border-right: none; }
+        .report-col-title {
+            font-size: 14px; font-weight: 800; color: var(--ink);
+            padding-bottom: 12px; border-bottom: 2px solid var(--ink);
+            margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
+        }
+        .report-col-title .dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+        .dot.current { background: var(--accent); }
+        .dot.competitor { background: var(--ink-light); }
+        .dot.action { background: var(--accent-deep); }
+        .report-col-body { font-size: 14px; color: var(--ink-muted); line-height: 1.8; }
+        .report-col-body strong { color: var(--ink); }
+
+        .risk-block {
+            margin-top: 32px; padding: 28px 32px;
+            background: var(--paper-warm); border-radius: 8px;
+            border-left: 4px solid var(--accent);
+        }
+        .risk-block-title { font-size: 13px; font-weight: 800; color: var(--ink); margin-bottom: 12px; letter-spacing: 0.05em; }
+        .risk-list { list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 6px 32px; }
+        .risk-list li {
+            font-size: 14px; color: var(--ink-muted); padding: 4px 0 4px 16px; position: relative;
+        }
+        .risk-list li::before {
+            content: ''; position: absolute; left: 0; top: 12px;
+            width: 6px; height: 6px; border-radius: 1px; background: var(--accent);
+        }
+
+        /* ========== FEATURES ========== */
+        .features-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+            border: 1px solid var(--rule-light); border-radius: 8px; overflow: hidden;
+        }
+        .feature-item {
+            padding: 48px 40px;
+            border-right: 1px solid var(--rule-light);
+            border-bottom: 1px solid var(--rule-light);
+            transition: background 0.25s;
+            position: relative;
+        }
+        .feature-item:nth-child(2n) { border-right: none; }
+        .feature-item:nth-last-child(-n+2) { border-bottom: none; }
+        .feature-item:hover { background: var(--white); }
+        .feature-item:last-child { grid-column: span 2; }
+        .feature-idx {
+            font-family: 'Noto Serif SC', serif;
+            font-size: 13px; font-weight: 700; color: var(--accent);
+            letter-spacing: 0.1em; margin-bottom: 16px;
+        }
+        .feature-name { font-size: 20px; font-weight: 800; color: var(--ink); margin-bottom: 12px; }
+        .feature-text { font-size: 14px; color: var(--ink-muted); line-height: 1.8; }
+
+        /* ========== OPTIMIZATION ========== */
+        .opt-section { background: var(--dark-surface); }
+        .opt-section .sec-kicker { color: var(--accent); }
+        .opt-section .sec-title { color: var(--white); }
+        .opt-section .sec-desc { color: rgba(255,255,255,0.5); }
+
+        .opt-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+            border: 1px solid var(--dark-rule); border-radius: 8px; overflow: hidden;
+        }
+        .opt-item {
+            padding: 24px 28px; display: flex; gap: 16px; align-items: flex-start;
+            border-right: 1px solid var(--dark-rule); border-bottom: 1px solid var(--dark-rule);
+            transition: background 0.25s;
+        }
+        .opt-item:nth-child(2n) { border-right: none; }
+        .opt-item:nth-last-child(-n+2) { border-bottom: none; }
+        .opt-item:hover { background: var(--dark-card); }
+        .opt-check {
+            width: 22px; height: 22px; border-radius: 3px;
+            border: 2px solid var(--accent); flex-shrink: 0; margin-top: 2px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px; color: var(--accent); font-weight: 900;
+        }
+        .opt-content strong { display: block; font-size: 14px; font-weight: 700; color: var(--white); margin-bottom: 4px; }
+        .opt-content span { font-size: 13px; color: rgba(255,255,255,0.4); line-height: 1.6; }
+
+        /* ========== WORKFLOW ========== */
+        .workflow-row {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 48px;
+            counter-reset: step;
+        }
+        .workflow-step { text-align: left; position: relative; padding-top: 24px; }
+        .workflow-step::before {
+            counter-increment: step;
+            content: counter(step, decimal-leading-zero);
+            font-family: 'Noto Serif SC', serif;
+            font-size: 14px; font-weight: 700; color: var(--accent);
+            letter-spacing: 0.1em;
+            display: block; margin-bottom: 12px;
+            padding-bottom: 12px; border-bottom: 2px solid var(--accent);
+            width: 48px;
+        }
+        .workflow-step-title { font-size: 20px; font-weight: 800; color: var(--ink); margin-bottom: 10px; }
+        .workflow-step-desc { font-size: 14px; color: var(--ink-muted); line-height: 1.8; }
+
+        /* ========== FINAL CTA ========== */
+        .final-cta {
+            background: var(--dark-surface); text-align: center;
+            padding: 120px 0;
+        }
+        .final-cta .sec-kicker { justify-content: center; color: var(--accent); }
+        .final-cta .sec-kicker::before { display: none; }
+        .final-cta h2 {
+            font-size: 42px; font-weight: 900; color: var(--white);
+            line-height: 1.3; letter-spacing: -0.01em; margin-bottom: 20px;
+        }
+        .final-cta p {
+            font-size: 16px; color: rgba(255,255,255,0.5); max-width: 520px;
+            margin: 0 auto 40px; line-height: 1.8;
+        }
+        .btn-cta-large {
+            background: var(--accent); color: var(--white); padding: 18px 48px;
+            border-radius: 4px; text-decoration: none; font-size: 16px; font-weight: 700;
+            display: inline-block; transition: all 0.25s;
+        }
+        .btn-cta-large:hover { background: var(--accent-deep); transform: translateY(-2px); box-shadow: 0 8px 30px rgba(196,92,26,0.3); }
+        .cta-trust {
+            margin-top: 28px; font-size: 13px; color: rgba(255,255,255,0.3);
+        }
+
+        /* ========== FOOTER ========== */
+        .footer {
+            background: var(--dark-surface); border-top: 1px solid var(--dark-rule);
+            padding: 40px 0;
+        }
+        .footer-inner {
+            max-width: 1200px; margin: 0 auto; padding: 0 40px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .footer-logo { font-size: 15px; font-weight: 800; color: var(--white); }
+        .footer-logo em { font-style: normal; color: var(--accent); }
+        .footer-links { display: flex; gap: 28px; }
+        .footer-links a { color: rgba(255,255,255,0.35); text-decoration: none; font-size: 13px; transition: color 0.2s; }
+        .footer-links a:hover { color: rgba(255,255,255,0.7); }
+        .footer-copy {
+            max-width: 1200px; margin: 20px auto 0; padding: 20px 40px 0;
+            border-top: 1px solid var(--dark-rule);
+            font-size: 12px; color: rgba(255,255,255,0.2); text-align: center;
+        }
+
+        /* ========== MOBILE CTA ========== */
+        .mobile-fixed-cta {
+            display: none; position: fixed; bottom: 0; left: 0; right: 0; z-index: 999;
+            background: var(--accent); color: var(--white); text-align: center;
+            padding: 16px; font-size: 15px; font-weight: 700; text-decoration: none;
+        }
+
+        /* ========== FADE IN ========== */
+        .fade { opacity: 0; transform: translateY(24px); transition: all 0.7s ease; }
+        .fade.in { opacity: 1; transform: translateY(0); }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 1024px) {
+            .hero-inner { grid-template-columns: 1fr; gap: 48px; }
+            .hero-left h1 { font-size: 36px; }
+            .chain-grid { grid-template-columns: repeat(2, 1fr); }
+            .chain-item:nth-child(2n) { border-right: none; }
+            .chain-item:nth-child(-n+2) { border-bottom: 1px solid var(--rule-light); }
+            .report-top { grid-template-columns: 1fr; }
+            .report-metric { border-right: none; border-bottom: 1px solid var(--rule-light); }
+            .report-metric:last-child { border-bottom: none; }
+            .report-bottom { grid-template-columns: 1fr; }
+            .report-col { border-right: none; border-bottom: 1px solid var(--rule-light); }
+            .report-col:last-child { border-bottom: none; }
+            .features-grid { grid-template-columns: 1fr; }
+            .feature-item { border-right: none !important; border-bottom: 1px solid var(--rule-light) !important; }
+            .feature-item:last-child { grid-column: span 1; border-bottom: none !important; }
+            .opt-grid { grid-template-columns: 1fr; }
+            .opt-item { border-right: none !important; }
+            .workflow-row { grid-template-columns: 1fr; gap: 40px; }
+            .risk-list { grid-template-columns: 1fr; }
+            .platforms-inner { flex-direction: column; gap: 24px; text-align: center; }
+            .platforms-names { flex-wrap: wrap; justify-content: center; gap: 24px; }
+            .platforms-note { text-align: center; }
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 0 24px; }
+            .header-inner { padding: 0 24px; }
+            .nav a:not(.nav-cta) { display: none; }
+            .hero-inner { padding: 48px 24px; }
+            .hero-left h1 { font-size: 30px; }
+            .section { padding: 64px 0; }
+            .sec-title { font-size: 28px; }
+            .chain-grid { grid-template-columns: 1fr; }
+            .chain-item { border-right: none !important; border-bottom: 1px solid var(--rule-light) !important; }
+            .chain-item:last-child { border-bottom: none !important; }
+            .chain-num { font-size: 48px; }
+            .final-cta h2 { font-size: 28px; }
+            .mobile-fixed-cta { display: block; }
+            .footer-inner { flex-direction: column; gap: 16px; text-align: center; }
+            .footer-links { justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header class="header">
+    <div class="header-inner">
+        <a href="#" class="logo">AI <em>外贸可见度</em></a>
+        <nav class="nav">
+            <a href="#chain">工作原理</a>
+            <a href="#report">诊断内容</a>
+            <a href="#features">产品能力</a>
+            <a href="#cta" class="nav-cta">免费诊断</a>
+        </nav>
+    </div>
+</header>
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+    <div class="hero-inner">
+        <div class="hero-left">
+            <div class="kicker">AI 外贸可见度</div>
+            <h1>海外买家问 AI<br>找供应商时<br><span class="accent">你在名单里吗？</span></h1>
+            <p class="sub">监测 ChatGPT、Gemini、Perplexity 等 AI 如何推荐、比较和评价你的公司。找到影响海外买家决策的竞争对手、口碑信息和可信来源。</p>
+            <div class="core">不只是让 AI 看见你，更要让海外买家在 AI 背调后信任你。</div>
+            <div class="hero-actions">
+                <a href="#cta" class="btn-main">预约免费 AI 海外曝光诊断</a>
+            </div>
+            <p class="hero-note" style="margin-top:16px;">提交公司官网即可，无需安装任何软件</p>
+        </div>
+
+        <!-- AI Chat Demo -->
+        <div class="chat-panel">
+            <div class="chat-bar">
+                <span class="chat-bar-label">海外买家 &times; AI 助手</span>
+                <span class="chat-bar-tag">DEMO</span>
+            </div>
+            <div class="chat-body">
+                <div class="msg">
+                    <div class="msg-sender buyer">海外买家</div>
+                    <div class="msg-text buyer-msg">推荐 <strong>5 家可靠的中国二手挖掘机供应商</strong>，需要有中亚出口经验。</div>
+                </div>
+
+                <div class="msg">
+                    <div class="msg-sender ai">AI 助手</div>
+                    <div class="msg-text ai-msg">
+                        根据出口记录、设备质量和客户评价，推荐以下供应商：
+                        <ul class="supplier-list">
+                            <li><span class="rank">1</span><span class="name">远东机械设备有限公司</span></li>
+                            <li><span class="rank">2</span><span class="name">中亚通达工程设备</span></li>
+                            <li><span class="rank">3</span><span class="name">恒力国际机械</span></li>
+                            <li class="you"><span class="rank">?</span><span class="name">你的公司在这里吗？</span><span class="tag">待确认</span></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="msg">
+                    <div class="msg-sender buyer">海外买家</div>
+                    <div class="msg-text buyer-msg">这家公司的口碑怎么样？<strong>是否值得信任？</strong></div>
+                </div>
+
+                <div class="msg">
+                    <div class="msg-sender ai">AI 助手</div>
+                    <div class="msg-text ai-msg">
+                        根据公开信息分析——<br><br>
+                        <strong style="color:#2d7d46;">&#10003;</strong> 有哈萨克斯坦交付案例<br>
+                        <strong style="color:#c45c1a;">&#9888;</strong> 缺少第三方客户评价<br>
+                        <strong style="color:#c45c1a;">&#9888;</strong> 设备检测流程信息不完整<br>
+                        <strong style="color:#999;">?</strong> 售后服务承诺未见明确说明
+                    </div>
+                </div>
+
+                <div class="msg">
+                    <div class="chat-question">
+                        <span>你的公司进入这个名单了吗？AI 会如何评价你的口碑？</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== PLATFORMS ===== -->
+<div class="platforms-strip">
+    <div class="platforms-inner">
+        <span class="platforms-label">监测覆盖平台</span>
+        <div class="platforms-names">
+            <span>ChatGPT</span>
+            <span>Gemini</span>
+            <span>Perplexity</span>
+            <span>Google AI</span>
+        </div>
+    </div>
+    <div class="platforms-note">* 监测覆盖的平台，非官方合作关系</div>
+</div>
+
+<!-- ===== DECISION CHAIN ===== -->
+<section id="chain" class="section">
+    <div class="container">
+        <div class="sec-head fade">
+            <div class="sec-kicker">买家的 AI 采购决策链</div>
+            <h2 class="sec-title">从寻找供应商到最终决策</h2>
+            <p class="sec-desc">海外买家正在使用 AI 完成整个采购决策过程。你的公司需要在每个环节都表现优异。</p>
+        </div>
+
+        <div class="chain-grid fade">
+            <div class="chain-item">
+                <div class="chain-num">01</div>
+                <div class="chain-name">找供应商</div>
+                <div class="chain-q">&ldquo;推荐 5 家可靠的中国二手挖掘机供应商&rdquo;</div>
+            </div>
+            <div class="chain-item">
+                <div class="chain-num">02</div>
+                <div class="chain-name">比较供应商</div>
+                <div class="chain-q">&ldquo;A 公司和 B 公司哪家更可靠？&rdquo;</div>
+            </div>
+            <div class="chain-item">
+                <div class="chain-num">03</div>
+                <div class="chain-name">背景调查</div>
+                <div class="chain-q">&ldquo;这家公司的口碑怎么样？&rdquo;</div>
+            </div>
+            <div class="chain-item">
+                <div class="chain-num">04</div>
+                <div class="chain-name">决定联系</div>
+                <div class="chain-q">&ldquo;我应该联系哪家供应商？&rdquo;</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== REPORT ===== -->
+<section id="report" class="section report-section">
+    <div class="container">
+        <div class="sec-head fade">
+            <div class="sec-kicker">示例诊断报告</div>
+            <h2 class="sec-title">一眼看懂三个核心问题</h2>
+            <p class="sec-desc">每份诊断报告都回答：<strong style="color:var(--ink)">我现在表现怎么样？谁比我做得好？我下一步应该做什么？</strong></p>
+        </div>
+        <div class="report-badge fade">示例数据</div>
+
+        <div class="report-top fade">
+            <div class="report-metric">
+                <div class="metric-label">AI 候选名单进入率</div>
+                <div class="metric-value orange">25%</div>
+                <div class="metric-detail">12 个采购问题中，被推荐 3 次</div>
+            </div>
+            <div class="report-metric">
+                <div class="metric-label">平均推荐位置</div>
+                <div class="metric-value">第 4 位</div>
+                <div class="metric-detail">进入名单时的平均排名</div>
+            </div>
+            <div class="report-metric">
+                <div class="metric-label">AI 更常推荐的竞争对手</div>
+                <div class="metric-value">3 家</div>
+                <div class="metric-detail">获得更高推荐权重的竞品</div>
+            </div>
+        </div>
+
+        <div class="report-bottom fade">
+            <div class="report-col">
+                <div class="report-col-title"><span class="dot current"></span>我现在表现怎么样</div>
+                <div class="report-col-body">AI 口碑评价：<strong>中性偏弱</strong>。主要引用来源为企业官网、行业目录、YouTube 和交易平台。</div>
+            </div>
+            <div class="report-col">
+                <div class="report-col-title"><span class="dot competitor"></span>谁比我做得好</div>
+                <div class="report-col-body">竞争对手依靠更完整的<strong>中亚案例、检测证明和客户评价</strong>获得更高推荐权重。</div>
+            </div>
+            <div class="report-col">
+                <div class="report-col-title"><span class="dot action"></span>我下一步应该做什么</div>
+                <div class="report-col-body">补充<strong>可验证的交付案例</strong>、完善检测流程说明、增加客户反馈证据。</div>
+            </div>
+        </div>
+
+        <div class="risk-block fade">
+            <div class="risk-block-title">主要风险与优先建议</div>
+            <ul class="risk-list">
+                <li>缺少第三方评价和客户反馈</li>
+                <li>出口案例和交付记录不够具体</li>
+                <li>设备检测标准和流程说明不足</li>
+                <li>售后服务承诺缺乏明确表述</li>
+                <li>优先建议：补充中亚交付案例、检测流程、客户反馈</li>
+                <li>在 AI 经常引用的平台建立可信资料</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- ===== FEATURES ===== -->
+<section id="features" class="section">
+    <div class="container">
+        <div class="sec-head fade">
+            <div class="sec-kicker">产品能力</div>
+            <h2 class="sec-title">五项核心能力</h2>
+            <p class="sec-desc">不只监测曝光，更深入分析 AI 如何评价你的企业信誉、实力和交易风险。</p>
+        </div>
+
+        <div class="features-grid fade">
+            <div class="feature-item">
+                <div class="feature-idx">01</div>
+                <div class="feature-name">AI 候选名单监测</div>
+                <div class="feature-text">监测公司在不同国家、产品和采购问题中的推荐情况。知道你在哪些场景下进入了候选名单，出现了多少次，排在第几位。</div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-idx">02</div>
+                <div class="feature-name">竞争对手发现</div>
+                <div class="feature-text">发现 AI 真正推荐的供应商，而不只是企业自己熟悉的同行。了解竞争对手依靠哪些优势获得了推荐。</div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-idx">03</div>
+                <div class="feature-name">AI 口碑与背调分析</div>
+                <div class="feature-text">了解 AI 如何描述公司的信誉、实力、服务和交易风险。知道 AI 看到了哪些实力证据和负面信息。</div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-idx">04</div>
+                <div class="feature-name">引用来源分析</div>
+                <div class="feature-text">找出影响 AI 判断的网站、行业目录、视频、新闻和第三方评价。知道 AI 的判断来自哪里。</div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-idx">05</div>
+                <div class="feature-name">可执行优化建议</div>
+                <div class="feature-text">不只是告诉你问题在哪里，更明确指出应该补充哪些案例、资质、内容和可信证据。每条建议都可以直接执行，帮助你提升进入 AI 候选名单的概率。</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== OPTIMIZATION ===== -->
+<section class="section opt-section">
+    <div class="container">
+        <div class="sec-head fade">
+            <div class="sec-kicker">优化建议示例</div>
+            <h2 class="sec-title">具体的行动方向</h2>
+            <p class="sec-desc">我们不会只说&ldquo;改善内容&rdquo;，而是给出足够具体的行动指南。</p>
+        </div>
+
+        <div class="opt-grid fade">
+            <div class="opt-item">
+                <div class="opt-check">&#10003;</div>
+                <div class="opt-content">
+                    <strong>发布目标市场交付案例</strong>
+                    <span>如哈萨克斯坦设备交付的详细过程和照片</span>
+                </div>
+            </div>
+            <div class="opt-item">
+                <div class="opt-check">&#10003;</div>
+                <div class="opt-content">
+                    <strong>补充完整的设备检测流程</strong>
+                    <span>发动机、液压系统和底盘的检测标准</span>
+                </div>
+            </div>
+            <div class="opt-item">
+                <div class="opt-check">&#10003;</div>
+                <div class="opt-content">
+                    <strong>增加可验证的客户评价</strong>
+                    <span>包含客户名称、采购时间、产品类型</span>
+                </div>
+            </div>
+            <div class="opt-item">
+                <div class="opt-check">&#10003;</div>
+                <div class="opt-content">
+                    <strong>说明付款、验货、运输和售后流程</strong>
+                    <span>让海外买家清楚整个交易过程</span>
+                </div>
+            </div>
+            <div class="opt-item">
+                <div class="opt-check">&#10003;</div>
+                <div class="opt-content">
+                    <strong>完善公司注册、仓库和库存信息</strong>
+                    <span>增强企业的可信度和真实性</span>
+                </div>
+            </div>
+            <div class="opt-item">
+                <div class="opt-check">&#10003;</div>
+                <div class="opt-content">
+                    <strong>在 AI 经常引用的平台建立资料</strong>
+                    <span>行业目录、B2B 平台、视频网站</span>
+                </div>
+            </div>
+            <div class="opt-item">
+                <div class="opt-check">&#10003;</div>
+                <div class="opt-content">
+                    <strong>针对不同国家制作采购指南</strong>
+                    <span>如中亚、中东、非洲市场的风险说明</span>
+                </div>
+            </div>
+            <div class="opt-item">
+                <div class="opt-check">&#10003;</div>
+                <div class="opt-content">
+                    <strong>补充出口记录和资质证书</strong>
+                    <span>可验证的报关单、ISO 认证等</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== WORKFLOW ===== -->
+<section class="section">
+    <div class="container">
+        <div class="sec-head fade" style="text-align:center; max-width:600px; margin:0 auto 64px;">
+            <div class="sec-kicker" style="justify-content:center;">工作流程</div>
+            <h2 class="sec-title">三步获得诊断报告</h2>
+            <p class="sec-desc">简单快捷，无需安装任何软件</p>
+        </div>
+
+        <div class="workflow-row fade">
+            <div class="workflow-step">
+                <div class="workflow-step-title">提交信息</div>
+                <div class="workflow-step-desc">提交公司官网、主营产品和目标市场</div>
+            </div>
+            <div class="workflow-step">
+                <div class="workflow-step-title">模拟采购场景</div>
+                <div class="workflow-step-desc">系统模拟海外买家的真实采购与背调问题</div>
+            </div>
+            <div class="workflow-step">
+                <div class="workflow-step-title">获得诊断报告</div>
+                <div class="workflow-step-desc">获取 AI 推荐、竞品、口碑、来源和优化建议</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== FINAL CTA ===== -->
+<section id="cta" class="final-cta">
+    <div class="container">
+        <div class="sec-kicker fade">免费诊断</div>
+        <h2 class="fade">先看看，海外买家的 AI<br>能不能找到并信任你</h2>
+        <p class="fade">提交公司官网，我们将从真实海外采购场景出发，为你生成一份免费的 AI 海外曝光诊断。</p>
+        <a href="#" class="btn-cta-large fade">预约免费诊断</a>
+        <p class="cta-trust fade">提交公司官网即可 &middot; 无需安装任何软件 &middot; 24 小时内出报告</p>
+    </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="footer">
+    <div class="footer-inner">
+        <div class="footer-logo">AI <em>外贸可见度</em></div>
+        <div class="footer-links">
+            <a href="#">关于我们</a>
+            <a href="#">联系方式</a>
+            <a href="#">隐私政策</a>
+            <a href="#">服务条款</a>
+        </div>
+    </div>
+    <div class="footer-copy">&copy; 2026 AI 外贸可见度 &middot; 帮助中国供应商进入海外买家的 AI 候选名单</div>
+</footer>
+
+<!-- Mobile Fixed CTA -->
+<a href="#cta" class="mobile-fixed-cta">预约免费诊断</a>
+
+<script>
+    // Intersection Observer for fade-in
+    const obs = new IntersectionObserver((entries) => {
+        entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+    document.querySelectorAll('.fade').forEach(el => obs.observe(el));
+</script>
+
+</body>
+</html>
